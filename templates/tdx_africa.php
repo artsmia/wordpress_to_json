@@ -5,6 +5,7 @@ global $wpdb;
 global $post;
 $objects = array();
 $stories = array();
+$notes = array();
 
 $posts = $wpdb->get_results(
 	"SELECT * FROM $wpdb->posts WHERE (post_type = 'object' || post_type = 'story') && post_status = 'publish'"
@@ -14,20 +15,34 @@ foreach($posts as $post){
 	setup_postdata($post);
 	if($post->post_type == 'object'){
 		// VIEWS
+		$tms_id = get_field('tms_id');
 		$rows = get_field('views');
 		$views = array();
 		for($n=0;$n<count($rows);$n++){
 			//$views[$n]['primary'] = $rows[$n]['primary'];
-			$views[$n]['image'] = $rows[$n]['img_link'];
+			$image = $views[$n]['image'] = $rows[$n]['img_link'];
 			$views[$n]['credit'] = $rows[$n]['credit'];
 			$views[$n]['annotations'] = array();
 			//ANNOTATIONS
+      $ch = curl_init();
+      curl_setopt($ch, CURLOPT_URL, "https://afrx.firebaseio.com/".$image."/notes2.json");
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+      curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+      $annotation_json = curl_exec($ch);
+      $f_annotations = json_decode($annotation_json);
+      curl_close($ch);
+
+      $image_notes = array();
 			$annos = $rows[$n]['annotations'];
 			for($i=0;$i<count($annos);$i++){
-				$views[$n]['annotations'][$i]['x'] = $annos[$i]['x'];
-				$views[$n]['annotations'][$i]['y'] = $annos[$i]['y'];
-				$views[$n]['annotations'][$i]['description'] = $annos[$i]['description'];
+        $views[$n]['annotations'][$i] = $image_notes[$i] = array(
+          'description' => $annos[$i]['description'],
+          'firebase' => $f_annotations[$i]
+        );
 			}
+
+      $notes[$image] = $image_notes;
+      /* echo json_encode($notes); die(); */
 		}
 		// CONNECTIONS
 		$rels = array();
@@ -45,7 +60,7 @@ foreach($posts as $post){
 			}
 		}
 		// BASIC INFO 
-		$objects[] = array(
+		$objects[$tms_id] = array(
 			'id' => get_the_ID(),
 			'title' => get_the_title(),
 			'description' => get_field('description'),
@@ -107,7 +122,8 @@ foreach($posts as $post){
 
 $json = array(
 	'objects' => $objects,
-	'stories' => $stories
+	'stories' => $stories,
+  'notes' => $notes
 );
 
 echo json_encode($json);
