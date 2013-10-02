@@ -6,10 +6,19 @@ global $post;
 $objects = array();
 $stories = array();
 $notes = array();
+$tms_hash = array();
 
 $posts = $wpdb->get_results(
   "SELECT * FROM $wpdb->posts WHERE (post_type = 'object' || post_type = 'story') && post_status = 'publish'"
 );
+
+// Populate hash of object post IDs and TMS IDs
+foreach($posts as $post){
+  if($post->post_type == 'object'){
+    $tms_hash[$post->ID] = get_field('tms_id', $post->ID);
+  }
+}
+reset($posts);
 
 foreach($posts as $post){
   setup_postdata($post);
@@ -105,7 +114,7 @@ foreach($posts as $post){
     );
     if($connected){
       foreach($connected as $connection){
-        $rels[] = $connection->ID;
+        $rels[] = $tms_hash[$connection->ID];
       }
     }
     // BASIC INFO
