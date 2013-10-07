@@ -36,6 +36,7 @@ foreach($posts as $post){
       $annos = $rows[$n]['annotations'];
       for($i=0;$i<count($annos);$i++){
         $views[$n]['annotations'][$i] = $image_notes[$i] = array(
+          'title' => $annos[$i]['title'],
           'description' => $annos[$i]['description'],
           'firebase' => $f_annotations[$i]
         );
