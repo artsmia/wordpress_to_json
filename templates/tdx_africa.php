@@ -110,7 +110,7 @@ foreach($posts as $post){
       }
     }
     // BASIC INFO
-    $stories[] = array(
+    $stories[get_the_ID()] = array(
       'id' => get_the_ID(),
       'title' => get_the_title(),
       'pages' => $pages,
