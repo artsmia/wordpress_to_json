@@ -49,6 +49,11 @@ foreach($posts as $post){
           'description' => $annos[$i]['description'],
           'firebase' => $f_annotations[$i]
         );
+        $attachments = $annos[$i]['attachments'];
+        foreach($attachments as $attachment){
+          $id = $attachment['attachment_img_link'];
+          $views[$n]['annotations'][$i]['attachments'][] = $id;
+        }
       }
 
       $notes[$image] = $image_notes;
