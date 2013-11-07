@@ -45,7 +45,7 @@ foreach($posts as $post){
       $annos = $rows[$n]['annotations'];
       for($i=0;$i<count($annos);$i++){
         $views[$n]['annotations'][$i] = $image_notes[$i] = array(
-          'title' => $annos[$i]['title'],
+          'title' => mb_convert_encoding($annos[$i]['title'], "UTF-8", "HTML-ENTITIES"),
           'description' => $annos[$i]['description'],
           'firebase' => $f_annotations[$i]
         );
