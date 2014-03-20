@@ -51,7 +51,7 @@ function add_json_posttype() {
 add_filter('template_redirect', 'json_template');
 function json_template(){
   if(is_post_type_archive('json')){
-    include('templates/tdx_africa.php');
+    include('templates/for_griot.php');
     exit;
   }
 }
